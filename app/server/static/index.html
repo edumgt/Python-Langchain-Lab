@@ -578,6 +578,75 @@
       text-align: right;
     }
 
+    /* ── Feedback row ── */
+    .feedback-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--tv-border);
+    }
+    .feedback-label {
+      font-size: 11px;
+      color: var(--tv-muted);
+      flex: 1;
+    }
+    .btn-feedback {
+      background: var(--tv-bg);
+      border: 1px solid var(--tv-border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .15s;
+      line-height: 1.6;
+    }
+    .btn-feedback:hover:not(:disabled) { border-color: var(--tv-accent); background: var(--tv-badge-rag); }
+    .btn-feedback.selected-up   { background: #dcfce7; border-color: var(--tv-green); }
+    .btn-feedback.selected-down { background: #fee2e2; border-color: var(--tv-red); }
+    .btn-feedback:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* routed-by badge */
+    .routed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+
+    /* ── Feedback stats in sidebar ── */
+    .fb-stats-wrap { padding: 10px 14px; }
+    .fb-stat-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .fb-mode-label {
+      width: 36px;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--tv-secondary);
+      text-transform: uppercase;
+    }
+    .fb-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--tv-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .fb-bar { height: 100%; border-radius: 10px; transition: width .4s; }
+    .fb-count { font-size: 11px; color: var(--tv-muted); min-width: 38px; text-align: right; }
+
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -621,6 +690,14 @@
 
       <label>검색 문서 수 (Top K)</label>
       <input type="number" id="topk-input" value="5" min="1" max="20">
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Feedback Stats -->
+    <div class="sidebar-section-label">📊 피드백 현황</div>
+    <div class="fb-stats-wrap" id="fb-stats">
+      <div style="font-size:12px;color:var(--tv-muted)">아직 피드백 없음</div>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -820,7 +897,7 @@ async function sendMessage() {
     if (!res.ok) throw new Error(`서버 오류 (${res.status})`);
     const data = await res.json();
     removeTyping(typingId);
-    appendAIBubble(data);
+    appendAIBubble(data, q);
   } catch (err) {
     removeTyping(typingId);
     appendErrorBubble(err.message);
@@ -838,8 +915,8 @@ function appendUserBubble(text) {
   scrollBottom();
 }
 
-function appendAIBubble(data) {
-  const { answer = '', mode = 'rag', used_docs = [] } = data;
+function appendAIBubble(data, q) {
+  const { answer = '', mode = 'rag', used_docs = [], routed_by = 'default' } = data;
 
   const modeIcons = { rag: 'database', chat: 'chat-dots', plan: 'kanban' };
   const modeLabels = { rag: 'RAG', chat: 'Chat', plan: 'Plan' };
@@ -856,16 +933,35 @@ function appendAIBubble(data) {
       </div>`
     : '';
 
+  const routedBadge = routed_by === 'feedback'
+    ? `<span class="routed-badge"><i class="bi bi-graph-up"></i> 피드백 기반</span>`
+    : '';
+
+  const qEsc = escHtml(q || '');
+  const modeEsc = escHtml(mode);
+  const usedDocsJson = escHtml(JSON.stringify(used_docs));
+
   const row = document.createElement('div');
   row.className = 'msg-row ai';
   row.innerHTML = `
     <div class="bubble ai">
-      <div class="mode-badge ${escHtml(mode)}">
-        <i class="bi bi-${modeIcons[mode] || 'cpu'}"></i>
-        ${modeLabels[mode] || mode}
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+        <div class="mode-badge ${modeEsc}" style="margin-bottom:0;">
+          <i class="bi bi-${modeIcons[mode] || 'cpu'}"></i>
+          ${modeLabels[mode] || mode}
+        </div>
+        ${routedBadge}
       </div>
       <div class="md-content">${mdHtml}</div>
       ${sourcesHtml}
+      <div class="feedback-row"
+           data-q="${qEsc}"
+           data-mode="${modeEsc}"
+           data-used-docs="${usedDocsJson}">
+        <span class="feedback-label">답변이 도움이 됐나요?</span>
+        <button class="btn-feedback" onclick="submitFeedback(this, 1)" title="도움됨">👍</button>
+        <button class="btn-feedback" onclick="submitFeedback(this, -1)" title="별로임">👎</button>
+      </div>
     </div>`;
   document.getElementById('messages').appendChild(row);
   scrollBottom();
@@ -944,8 +1040,74 @@ function friendlySourceName(src) {
   return map[base] || base;
 }
 
+/* ── Feedback ── */
+async function submitFeedback(btn, rating) {
+  const row = btn.closest('.feedback-row');
+  const q    = row.dataset.q;
+  const mode = row.dataset.mode;
+  let usedDocs = [];
+  try { usedDocs = JSON.parse(row.dataset.usedDocs || '[]'); } catch {}
+
+  row.querySelectorAll('.btn-feedback').forEach(b => b.disabled = true);
+  btn.classList.add(rating === 1 ? 'selected-up' : 'selected-down');
+  row.querySelector('.feedback-label').textContent =
+    rating === 1 ? '감사합니다! 다음 추천에 반영됩니다 😊' : '아쉽네요, 개선하겠습니다 🙏';
+
+  try {
+    await fetch('/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q, mode, rating, used_docs: usedDocs }),
+    });
+    await loadFeedbackStats();
+  } catch {}
+}
+
+async function loadFeedbackStats() {
+  try {
+    const res  = await fetch('/feedback/stats');
+    const data = await res.json();
+    renderFeedbackStats(data);
+  } catch {}
+}
+
+function renderFeedbackStats(data) {
+  const wrap = document.getElementById('fb-stats');
+  if (!data || data.total === 0) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--tv-muted)">아직 피드백 없음</div>';
+    return;
+  }
+
+  const modeColors = { rag: '#2962ff', chat: '#26a69a', plan: '#f59e0b' };
+  const modeLabels = { rag: 'RAG', chat: 'Chat', plan: 'Plan' };
+  const stats = data.mode_stats || {};
+
+  const maxTotal = Math.max(...Object.values(stats).map(s => s.total), 1);
+
+  const rows = Object.entries(stats).map(([m, s]) => {
+    const color = modeColors[m] || '#888';
+    const pct   = Math.round((s.up / Math.max(s.total, 1)) * 100);
+    const barW  = Math.round((s.total / maxTotal) * 100);
+    return `
+      <div class="fb-stat-row">
+        <span class="fb-mode-label">${modeLabels[m] || m}</span>
+        <div class="fb-bar-wrap">
+          <div class="fb-bar" style="width:${barW}%;background:${color};"></div>
+        </div>
+        <span class="fb-count">👍${s.up} 👎${s.down}</span>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div style="font-size:11px;color:var(--tv-muted);margin-bottom:8px;">
+      총 ${data.total}건 피드백 수집
+    </div>
+    ${rows}`;
+}
+
 /* ── Init ── */
 renderDocList();
+loadFeedbackStats();
 document.getElementById('user-input').focus();
 </script>
 </body>

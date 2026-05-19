@@ -5,38 +5,47 @@ services:
       dockerfile: docker/Dockerfile
     container_name: langchain-catalog-lab
     env_file:
-      - .env
+    - .env
     working_dir: /app
     environment:
-      - PYTHONPATH=/app
+    - PYTHONPATH=/app
     volumes:
-      - ./:/app
-      - ./data:/app/data
-      - ./storage:/app/storage
-    command: ["python", "catalog/health/00_healthcheck.py"]
-
+    - ./:/app
+    - ./data:/app/data
+    - ./storage:/app/storage
+    command:
+    - python
+    - catalog/health/00_healthcheck.py
+    networks:
+    - shared-net
   api:
     build:
       context: .
       dockerfile: docker/Dockerfile
     container_name: langchain-catalog-api
     env_file:
-      - .env
+    - .env
     working_dir: /app
     environment:
-      - PYTHONPATH=/app
+    - PYTHONPATH=/app
+    - OLLAMA_BASE_URL=http://ollama:11434
     volumes:
-      - ./:/app
+    - ./:/app
     command: uvicorn app.server.main:app --host 0.0.0.0 --port 8000
     ports:
-      - "8988:8000"
-
+    - 8988:8000
+    networks:
+    - shared-net
+    depends_on:
+    - ollama
   ollama:
     image: ollama/ollama:latest
-    # ports:
-    #   - "11434:11434"
     volumes:
-      - ollama:/root/.ollama
-
+    - ollama:/root/.ollama
+    networks:
+    - shared-net
 volumes:
-  ollama:
+  ollama: null
+networks:
+  shared-net:
+    driver: bridge

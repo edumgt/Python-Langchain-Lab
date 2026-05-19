@@ -34,6 +34,8 @@ from app.server.proposal_footnotes import apply_footnotes
 
 from app.server.agent import run, answer_rag, answer_chat, answer_plan
 from app.server.store import get_action, update_status
+from app.server.feedback import save_feedback, get_stats as feedback_stats
+from app.server.eval import full_report as eval_report
 
 from app.tools.schemas import (
     BudgetSplitRequest, BudgetSplitResponse,
@@ -207,6 +209,28 @@ def artbiz_proposal_template():
 def artbiz_proposal_check(payload: dict):
     md = payload.get("markdown","")
     return {"ok": True, "check": check_structure(md)}
+
+
+@app.post("/feedback")
+def feedback(payload: dict):
+    q = payload.get("q", "")
+    mode = payload.get("mode", "rag")
+    rating = int(payload.get("rating", 1))
+    used_docs = payload.get("used_docs", [])
+    if rating not in (1, -1):
+        raise HTTPException(status_code=422, detail="rating must be 1 or -1")
+    entry = save_feedback(q, mode, rating, used_docs)
+    return {"ok": True, "id": entry["id"]}
+
+
+@app.get("/feedback/stats")
+def feedback_stats_endpoint():
+    return feedback_stats()
+
+
+@app.get("/eval")
+def eval_endpoint(total_responses: int = 0):
+    return eval_report(total_responses)
 
 
 @app.get("/health")
