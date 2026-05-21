@@ -31,3 +31,8 @@ TOP_K = int(env("TOP_K", "5") or "5")
 LANGCHAIN_TRACING_V2 = (env("LANGCHAIN_TRACING_V2", "false") or "false").lower() == "true"
 LANGCHAIN_API_KEY = env("LANGCHAIN_API_KEY", "")
 LANGCHAIN_PROJECT = env("LANGCHAIN_PROJECT", "langchain-catalog-lab")
+
+# Langfuse — LLM Observability (tracing, cost, prompt management, eval)
+LANGFUSE_SECRET_KEY = env("LANGFUSE_SECRET_KEY", "")
+LANGFUSE_PUBLIC_KEY = env("LANGFUSE_PUBLIC_KEY", "")
+LANGFUSE_HOST = env("LANGFUSE_HOST", "https://cloud.langfuse.com")

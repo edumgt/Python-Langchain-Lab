@@ -90,3 +90,12 @@
 - footnotes: SOURCE -> [1]/[2] + appendix snippet mapping (`proposal_footnotes.py`)
 - eval: footnote mapping (`catalog/eval/11_footnote_mapping.py`)
 - docs: v16 features (`docs/V16_FEATURES.md`)
+
+## v17 additions
+- monitoring: Langfuse LLM Observability 연동 (`catalog/monitoring/*`)
+  - 01_langfuse_tracing.py     — @observe 데코레이터로 RAG 파이프라인 Trace
+  - 02_langfuse_cost_tracking.py — generation span으로 토큰/비용 집계
+  - 03_langfuse_prompt_management.py — 서버 프롬프트 버전 관리 및 교체
+  - 04_langfuse_evaluation.py  — LLM-as-Judge Score + 사용자 피드백 기록
+- lessons: Langfuse 통합 레슨 (`lessons/14_langfuse_monitoring.py`)
+- settings: Langfuse 환경 변수 추가 (`app/core/settings.py`)
