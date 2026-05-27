@@ -1,20 +1,22 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
 # LangChain Catalog Lab (Docker + Python)
  
 LangChain의 기능을 **“카탈로그(기능별 독립 데모)”** 형태로 최대한 촘촘하게 정리한 학습 레포입니다.  
 각 데모는 **단독 실행 가능**하며, 동일한 `LLM Factory`를 통해 **Ollama / OpenAI-호환 / OpenAI**를 스위칭할 수 있습니다.
 
-- ✅ Docker 한 번으로 실행
-- ✅ LCEL(Runnable) 중심 (LangChain의 “조합 언어”)
-- ✅ Prompts / Output Parsers / Structured Output / Streaming
-- ✅ Tools / Tool calling / Agents (ReAct 등)
-- ✅ Retrievers / VectorStores / Loaders / RAG 고급 패턴
-- ✅ Memory / History / Summarization / Windowing
-- ✅ Router / Multi-prompt / JSON mode / Guardrails (실습 관점)
-- ✅ SQL / CSV / Web 요청(안전한 범위) 유틸
-- ✅ Callbacks / Tracing (옵션 LangSmith)
-- ✅ Eval (미니) + 회귀 테스트 샘플
+- <i class="fa-solid fa-circle-check"></i> Docker 한 번으로 실행
+- <i class="fa-solid fa-circle-check"></i> LCEL(Runnable) 중심 (LangChain의 “조합 언어”)
+- <i class="fa-solid fa-circle-check"></i> Prompts / Output Parsers / Structured Output / Streaming
+- <i class="fa-solid fa-circle-check"></i> Tools / Tool calling / Agents (ReAct 등)
+- <i class="fa-solid fa-circle-check"></i> Retrievers / VectorStores / Loaders / RAG 고급 패턴
+- <i class="fa-solid fa-circle-check"></i> Memory / History / Summarization / Windowing
+- <i class="fa-solid fa-circle-check"></i> Router / Multi-prompt / JSON mode / Guardrails (실습 관점)
+- <i class="fa-solid fa-circle-check"></i> SQL / CSV / Web 요청(안전한 범위) 유틸
+- <i class="fa-solid fa-circle-check"></i> Callbacks / Tracing (옵션 LangSmith)
+- <i class="fa-solid fa-circle-check"></i> Eval (미니) + 회귀 테스트 샘플
 
-> ⚠️ 일부 기능은 모델 백엔드(예: Ollama vs OpenAI-호환)에 따라 “지원 방식/결과”가 다릅니다.  
+> <i class="fa-solid fa-triangle-exclamation"></i>️ 일부 기능은 모델 백엔드(예: Ollama vs OpenAI-호환)에 따라 “지원 방식/결과”가 다릅니다.  
 > 각 데모 파일 상단에 호환성 노트를 적어두었습니다.
 
 ---
@@ -385,7 +387,7 @@ ightarrow$ **[추천 로직 개선]**
 
 ---
 
-> 💡 **한 줄 요약**
+> <i class="fa-solid fa-lightbulb"></i> **한 줄 요약**
 > 사용자가 쓰면 쓸수록 데이터가 쌓이고, 그 데이터 덕분에 AI가 점점 더 내 입맛에 맞는 걸 기가 막히게 추천하도록 진화한다는 뜻입니다.
 
 ---
@@ -398,7 +400,7 @@ ightarrow$ **[추천 로직 개선]**
 
 일반적인 웹 서비스에서 시스템의 상태를 모니터링하기 위해 Datadog이나 구글 애널리틱스를 사용하는 것처럼, LLM 애플리케이션의 성능, 비용, 프롬프트 품질을 전문적으로 관리하기 위해 사용됩니다.
 
-### 💡 핵심 제공 기능 4가지
+### <i class="fa-solid fa-lightbulb"></i> 핵심 제공 기능 4가지
 1. **Tracing (실행 과정 추적):** 사용자의 요청이 들어와 답변이 나갈 때까지 내부에서 일어나는 모든 단계(RAG, 프롬프트 조립, API 호출 등)를 타임라인 형태로 시각화하여 어떤 구간에서 병목(지연)이 발생하는지 파악합니다.
 2. **Cost Tracking (비용 및 토큰 추적):** 모델별(GPT, Claude 등) 입력/출력 토큰 수를 실시간으로 집계하고, 이를 실제 청구 비용(USD)으로 계산하여 대시보드에 표시합니다.
 3. **Prompt Management (프롬프트 관리):** 소스 코드 내부에 프롬프트를 하드코딩하지 않고, Langfuse 서버에서 버전별로 중앙 관리하며 코드 배포 없이 실시간으로 프롬프트를 교체 및 테스트할 수 있습니다.
@@ -516,14 +518,14 @@ OLLAMA_MODEL=llama3.1:8b
 
 | 항목 | EXAONE 3.5 | GPT-4o | Claude 3.5 |
 |------|-----------|--------|-----------|
-| 한국어 특화 | ★★★★★ | ★★★☆☆ | ★★★☆☆ |
-| 한국 문화 이해 | ★★★★★ | ★★★☆☆ | ★★★☆☆ |
-| 멀티모달 (4.5) | ★★★★★ | ★★★★★ | ★★★★☆ |
-| 로컬 실행 가능 | ✅ (Ollama) | ❌ | ❌ |
-| 오픈 웨이트 | ✅ | ❌ | ❌ |
-| 한국어 토크나이저 효율 | ★★★★★ | ★★★☆☆ | ★★★☆☆ |
+| 한국어 특화 | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> |
+| 한국 문화 이해 | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> |
+| 멀티모달 (4.5) | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i> |
+| 로컬 실행 가능 | <i class="fa-solid fa-circle-check"></i> (Ollama) | <i class="fa-solid fa-circle-xmark"></i> | <i class="fa-solid fa-circle-xmark"></i> |
+| 오픈 웨이트 | <i class="fa-solid fa-circle-check"></i> | <i class="fa-solid fa-circle-xmark"></i> | <i class="fa-solid fa-circle-xmark"></i> |
+| 한국어 토크나이저 효율 | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> | <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i> |
 
-> ⚠️ 비교 수치는 공개된 벤치마크 및 실사용 사례를 바탕으로 한 참고용 수치입니다.
+> <i class="fa-solid fa-triangle-exclamation"></i>️ 비교 수치는 공개된 벤치마크 및 실사용 사례를 바탕으로 한 참고용 수치입니다.
 
 ---
 
